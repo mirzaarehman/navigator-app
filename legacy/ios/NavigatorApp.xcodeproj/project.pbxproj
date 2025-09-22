@@ -530,7 +530,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.fleetbase.navigator;
+				PRODUCT_BUNDLE_IDENTIFIER = me.mazenfleet.navigator;
 				PRODUCT_NAME = NavigatorApp;
 				SWIFT_OBJC_BRIDGING_HEADER = "NavigatorApp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -565,7 +565,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.fleetbase.navigator;
+				PRODUCT_BUNDLE_IDENTIFIER = me.mazenfleet.navigator;
 				PRODUCT_NAME = NavigatorApp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "NavigatorApp-Bridging-Header.h";

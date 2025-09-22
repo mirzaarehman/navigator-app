@@ -1,4 +1,4 @@
-package io.fleetbase.navigator
+package me.mazenfleet.navigator
 
 import android.os.Bundle
 import com.facebook.react.ReactActivity
