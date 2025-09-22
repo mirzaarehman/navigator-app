@@ -5,4 +5,14 @@ import { name as appName } from './app.json';
 import 'react-native-get-random-values';
 import 'react-native-gesture-handler';
 
-AppRegistry.registerComponent(appName, () => App);
+// Initialize reanimated
+import 'react-native-reanimated';
+
+console.log('Registering app with name:', appName);
+
+try {
+    AppRegistry.registerComponent(appName, () => App);
+    console.log('App registered successfully');
+} catch (error) {
+    console.error('Failed to register app:', error);
+}
