@@ -1,12 +1,13 @@
 // index.native.tsx
+import 'react-native-gesture-handler';
+import 'react-native-get-random-values';
+
+// Initialize reanimated early but safely
+import 'react-native-reanimated';
+
 import { AppRegistry } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
-import 'react-native-get-random-values';
-import 'react-native-gesture-handler';
-
-// Initialize reanimated
-import 'react-native-reanimated';
 
 console.log('Registering app with name:', appName);
 
