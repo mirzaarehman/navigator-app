@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "353124272020",
+    "project_id": "mazenfleet-71897",
+    "storage_bucket": "mazenfleet-71897.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353124272020:android:7a4b1d39c2acc26161f181",
+        "android_client_info": {
+          "package_name": "me.mazenfleet.navigator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrDWQM7bUb0Fm3jzqa3rxS6m6mFgft0Tc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
