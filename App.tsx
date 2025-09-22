@@ -22,6 +22,7 @@ function AppContent(): React.JSX.Element {
     const { appTheme } = useThemeContext();
 
     return (
+        
         <TamaguiProvider config={config} theme={appTheme}>
             <Theme name={appTheme}>
                 <GestureHandlerRootView style={{ flex: 1 }}>
