@@ -200,6 +200,25 @@ jobs:
                   name: android-debug-apk
                   path: android/app/build/outputs/apk/debug/app-debug.apk
                   retention-days: 30
+            - name: Generate Debug Keystore SHA1
+              run: |
+                  keytool -genkeypair \
+                    -alias androiddebugkey \
+                    -keypass android \
+                    -keystore ~/.android/debug.keystore \
+                    -storepass android \
+                    -dname "CN=Android Debug,O=Android,C=US" \
+                    -validity 9999 \
+                    -keyalg RSA \
+                    -keysize 2048
+
+                  echo "Debug SHA1 (base64):"
+                  keytool -exportcert \
+                    -alias androiddebugkey \
+                    -keystore ~/.android/debug.keystore \
+                    -storepass android \
+                  | openssl sha1 -binary \
+                  | openssl base64
 
     ios_build:
         runs-on: macos-latest
