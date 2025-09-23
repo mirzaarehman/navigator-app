@@ -48,7 +48,7 @@ jobs:
                       ${{ runner.os }}-yarn-
 
             - name: Install dependencies
-              run: yarn install --immutable
+              run: yarn install --immutable=false
 
             - name: Create .env file
               run: |
@@ -99,7 +99,7 @@ jobs:
                       ${{ runner.os }}-deps-
 
             - name: Install dependencies
-              run: yarn install --immutable
+              run: yarn install --immutable=false
 
             - name: Create .env file
               run: |
@@ -266,7 +266,7 @@ jobs:
                       ${{ runner.os }}-deps-
 
             - name: Install dependencies
-              run: yarn install --immutable
+              run: yarn install --immutable=false
 
             - name: Create .env file
               run: |
@@ -358,7 +358,7 @@ jobs:
               run: corepack prepare yarn@3.6.4 --activate
 
             - name: Install dependencies
-              run: yarn install --immutable
+              run: yarn install --immutable=false
 
             - name: Create .env file
               run: |
@@ -427,7 +427,7 @@ jobs:
               run: corepack prepare yarn@3.6.4 --activate
 
             - name: Install dependencies
-              run: yarn install --immutable
+              run: yarn install --immutable=false
 
             - name: Create .env file
               run: |

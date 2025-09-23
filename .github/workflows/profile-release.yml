@@ -181,7 +181,7 @@ jobs:
               run: |
                   corepack enable
                   corepack prepare yarn@3.6.4 --activate
-                  yarn install --immutable
+                  yarn install --immutable=false
 
     # Resolve versions once to avoid races (parity across platforms)
     resolve-versions:
@@ -316,7 +316,7 @@ jobs:
               run: |
                   corepack enable
                   corepack prepare yarn@3.6.4 --activate
-                  yarn install --immutable
+                  yarn install --immutable=false
 
             - name: Setup JDK
               uses: actions/setup-java@v4
@@ -577,7 +577,7 @@ jobs:
               run: |
                   corepack enable
                   corepack prepare yarn@3.6.4 --activate
-                  yarn install --immutable
+                  yarn install --immutable=false
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
