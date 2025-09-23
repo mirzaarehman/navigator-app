@@ -1,10 +1,12 @@
-import { toast } from '@backpackapp-io/react-native-toast';
-import { appleAuth } from '@invertase/react-native-apple-authentication';
-import { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import useFleetbase from '../hooks/use-fleetbase';
+import { useState, useEffect } from 'react';
+import { authorize } from 'react-native-app-auth';
 import { config } from '../utils';
-// import { Settings as FacebookSDKSettings, LoginManager as FacebookLoginManager, Profile as FacebookProfile } from 'react-native-fbsdk-next';
+import { appleAuth } from '@invertase/react-native-apple-authentication';
+import { toast, ToastPosition } from '@backpackapp-io/react-native-toast';
+import useFleetbase from '../hooks/use-fleetbase';
+import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
+import { Settings as FacebookSDKSettings, LoginManager as FacebookLoginManager, Profile as FacebookProfile } from 'react-native-fbsdk-next';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const APP_LINK_PREFIX = config('APP_LINK_PREFIX');
@@ -23,11 +25,11 @@ const useOAuth = () => {
             return result;
         }
 
-        // if (provider === 'facebook') {
-        //     const result = await facebookLogin();
-        //     setAuthState(result);
-        //     return result;
-        // }
+        if (provider === 'facebook') {
+            const result = await facebookLogin();
+            setAuthState(result);
+            return result;
+        }
 
         if (provider === 'google') {
             const result = await googleLogin();
@@ -158,17 +160,17 @@ const useOAuth = () => {
             return typeof config('GOOGLE_CLIENT_ID') === 'string';
         }
 
-        // if (provider === 'facebook') {
-        //     return typeof config('FACEBOOK_APP_ID') === 'string' && typeof config('FACEBOOK_CLIENT_TOKEN') === 'string';
-        // }
+        if (provider === 'facebook') {
+            return typeof config('FACEBOOK_APP_ID') === 'string' && typeof config('FACEBOOK_CLIENT_TOKEN') === 'string';
+        }
     };
 
-    // useEffect(() => {
-    //     if (loginSupported('facebook')) {
-    //         FacebookSDKSettings.setAppID(config('FACEBOOK_APP_ID'));
-    //         FacebookSDKSettings.initializeSDK();
-    //     }
-    // }, []);
+    useEffect(() => {
+        if (loginSupported('facebook')) {
+            FacebookSDKSettings.setAppID(config('FACEBOOK_APP_ID'));
+            FacebookSDKSettings.initializeSDK();
+        }
+    }, []);
 
     useEffect(() => {
         if (loginSupported('google')) {
@@ -189,7 +191,7 @@ const useOAuth = () => {
         loginSupported,
         appleLoginIsSupported: loginSupported('apple'),
         googleLoginIsSupported: loginSupported('google'),
-        // facebookLoginIsSupported: loginSupported('facebook'),
+        facebookLoginIsSupported: loginSupported('facebook'),
     };
 };
 
