@@ -42,6 +42,7 @@ function AppContent(): React.JSX.Element {
                                                                 <PortalHost name='MainPortal' />
                                                                 <PortalHost name='BottomSheetPanelPortal' />
                                                                 <PortalHost name='LocationPickerPortal' />
+                                                                
                                                             </OrderManagerProvider>
                                                         </ChatProvider>
                                                     </TempStoreProvider>
