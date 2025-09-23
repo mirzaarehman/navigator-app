@@ -7,7 +7,8 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 import android.os.Bundle;
 import com.zoontek.rnbootsplash.RNBootSplash;
-
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 public class MainActivity extends ReactActivity {
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
@@ -36,5 +37,7 @@ public class MainActivity extends ReactActivity {
   protected void onCreate(Bundle savedInstanceState) {
     RNBootSplash.init(this); // ⬅️ initialize the splash screen
     super.onCreate(savedInstanceState); // or super.onCreate(null) with react-native-screens
+    FacebookSdk.sdkInitialize(getApplicationContext());
+    AppEventsLogger.activateApp(this);
   }
 }

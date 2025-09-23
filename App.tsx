@@ -4,7 +4,6 @@ import { PortalHost, PortalProvider } from '@gorhom/portal';
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import 'react-native-url-polyfill/auto';
 import { TamaguiProvider, Theme } from 'tamagui';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ChatProvider } from './src/contexts/ChatContext';
