@@ -1,12 +1,13 @@
-import BootScreen from '../../screens/BootScreen';
-import TestScreen from '../../screens/TestScreen';
-import LocationPermissionScreen from '../../screens/LocationPermissionScreen';
-import InstanceLinkScreen from '../../screens/InstanceLinkScreen';
-import { getTheme } from '../../utils';
-import { Text } from 'tamagui';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { Text } from 'tamagui';
 import HeaderButton from '../../components/HeaderButton';
+import BootScreen from '../../screens/BootScreen';
+import InstanceLinkScreen from '../../screens/InstanceLinkScreen';
+import LocationPermissionScreen from '../../screens/LocationPermissionScreen';
+import OrganizationSelectScreen from '../../screens/OrganizationSelectScreen';
+import BrandSelectScreen from '../../screens/BrandSelectScreen';
+import TestScreen from '../../screens/TestScreen';
+import { getTheme } from '../../utils';
 
 export const Boot = {
     screen: BootScreen,
@@ -46,6 +47,23 @@ export const InstanceLink = {
     },
 };
 
+export const OrganizationSelect = {
+    screen: OrganizationSelectScreen,
+    options: {
+        headerShown: false,
+        gestureEnabled: false,
+        animation: 'none',
+    },
+};
+
+export const BrandSelect = {
+    screen: BrandSelectScreen,
+    options: {
+        headerShown: false,
+        gestureEnabled: false,
+    },
+};
+
 export const Test = {
     screen: TestScreen,
 };
@@ -55,6 +73,8 @@ const CoreStack = {
     Test,
     LocationPermission,
     InstanceLink,
+    OrganizationSelect,
+    BrandSelect,
 };
 
 export default CoreStack;

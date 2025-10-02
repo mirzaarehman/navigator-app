@@ -1,6 +1,7 @@
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Boot, LocationPermission, InstanceLink } from './stacks/CoreStack';
+import { OrganizationSelect, BrandSelect } from './stacks/CoreStack';
 import AuthStack from './stacks/AuthStack';
 import DriverNavigator from './DriverNavigator';
 import { useIsNotAuthenticated, useIsAuthenticated } from '../contexts/AuthContext';
@@ -13,6 +14,8 @@ const RootStack = createNativeStackNavigator({
         Boot,
         LocationPermission,
         InstanceLink,
+        OrganizationSelect,
+        BrandSelect,
         ...AuthStack,
         DriverNavigator: {
             if: useIsAuthenticated,

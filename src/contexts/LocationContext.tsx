@@ -1,11 +1,11 @@
-import React, { createContext, useState, useEffect, useCallback, useContext, useMemo } from 'react';
-import BackgroundGeolocation from 'react-native-background-geolocation';
-import BackgroundFetch from 'react-native-background-fetch';
 import { Place, Point } from '@fleetbase/sdk';
-import { isEmpty, config } from '../utils';
-import { useAuth } from './AuthContext';
-import useStorage from '../hooks/use-storage';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import BackgroundFetch from 'react-native-background-fetch';
+import BackgroundGeolocation from 'react-native-background-geolocation';
 import useFleetbase from '../hooks/use-fleetbase';
+import useStorage from '../hooks/use-storage';
+import { config, isEmpty } from '../utils';
+import { useAuth } from './AuthContext';
 
 const LocationContext = createContext({
     location: null,
@@ -32,7 +32,9 @@ export const LocationProvider = ({ children }) => {
                 },
             });
             setLocation(location);
-            trackDriver(location.coords);
+            if (location && location.coords) {
+                trackDriver(location.coords);
+            }
         } catch (error) {
             console.warn('Error attempting to track and update location:', error);
         }
@@ -41,6 +43,10 @@ export const LocationProvider = ({ children }) => {
     // Get the drivers location as a Place
     const getDriverLocationAsPlace = useCallback(
         (attributes = {}) => {
+            if (!location || !location.coords) {
+                return null;
+            }
+
             const { coords } = location;
 
             return new Place(

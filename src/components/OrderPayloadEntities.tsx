@@ -15,6 +15,7 @@ const OrderPayloadEntities = ({ order, onPress }) => {
     const waypoints = order.getAttribute('payload.waypoints', []) ?? [];
     const entities = order.getAttribute('payload.entities', []) ?? [];
     const isMultiDropOrder = waypoints.length > 0;
+    console.log(order);
     const entitiesByDestination = useMemo(() => {
         // Return an empty array if there are no waypoints.
         if (!waypoints || waypoints.length === 0) {
@@ -74,39 +75,63 @@ const OrderPayloadEntities = ({ order, onPress }) => {
         );
     };
 
-    const renderDestinationGroup = ({ item: group, index }) => {
-        return (
-            <YStack px='$2' py='$2'>
-                <YStack>
-                    <YStack px='$1' py='$2' mb='$2'>
-                        <XStack alignItems='center'>
-                            <WaypointCircle number={index + 1} circleSize={24} mr='$2' backgroundColor='$success' borderWidth={1} borderColor='$successBorder' />
-                            <YStack width='90%'>
-                                <Text color='$textPrimary' fontWeight='bold' numberOfLines={1}>
-                                    {group.waypoint.address}
-                                </Text>
-                            </YStack>
-                        </XStack>
-                    </YStack>
-                    {group.waypoint.customer && (
-                        <YStack px='$1' mb='$1'>
-                            <OrderCustomerCard customer={group.waypoint.customer} />
-                        </YStack>
-                    )}
-                    <YStack>
-                        <SimpleGrid
-                            maxItemsPerRow={4}
-                            itemDimension={ENTITY_COLUMN_WIDTH}
-                            data={group.entities}
-                            renderItem={({ item: entity, index }) => <RenderEntity entity={entity} index={index} waypoint={group.waypoint} />}
-                            style={{ padding: 0, paddingLeft: 0 }}
-                            spacing={10}
-                        />
-                    </YStack>
-                </YStack>
+const renderDestinationGroup = ({ item: group, index }) => {
+  return (
+    <YStack px="$2" py="$2">
+      <YStack>
+        <YStack px="$1" py="$2" mb="$2">
+          <XStack alignItems="center">
+            <WaypointCircle
+              number={index + 1}
+              circleSize={24}
+              mr="$2"
+              backgroundColor="$success"
+              borderWidth={1}
+              borderColor="$successBorder"
+            />
+            <YStack width="90%">
+              <Text color="$textPrimary" fontWeight="bold" numberOfLines={1}>
+                {group.waypoint.address}
+              </Text>
             </YStack>
-        );
-    };
+          </XStack>
+        </YStack>
+
+        {group.waypoint.customer && (
+          <YStack px="$1" mb="$1">
+            <OrderCustomerCard
+              customer={group.waypoint.customer}
+              driverName={order.attributes.driver_assigned?.name}
+              orgName={order.attributes.driver_assigned?.company_name}
+              order={{
+                number: order.attributes?.order_number,
+                total: order.attributes?.order_total,
+              }}
+            />
+          </YStack>
+        )}
+
+        <YStack>
+          <SimpleGrid
+            maxItemsPerRow={4}
+            itemDimension={ENTITY_COLUMN_WIDTH}
+            data={group.entities}
+            renderItem={({ item: entity, index }) => (
+              <RenderEntity
+                entity={entity}
+                index={index}
+                waypoint={group.waypoint}
+              />
+            )}
+            style={{ padding: 0, paddingLeft: 0 }}
+            spacing={10}
+          />
+        </YStack>
+      </YStack>
+    </YStack>
+  );
+};
+
 
     // Handle multiple drop order render which should display the entities for each dropoff location
     if (isMultiDropOrder) {

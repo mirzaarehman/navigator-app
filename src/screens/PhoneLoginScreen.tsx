@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, Pressable, Keyboard, StyleSheet } from 'react-native';
-import { Spinner, Input, Stack, Text, YStack, useTheme, Button } from 'tamagui';
-import { toast, ToastPosition } from '@backpackapp-io/react-native-toast';
+import { toast } from '@backpackapp-io/react-native-toast';
+import { faArrowLeft, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faPaperPlane, faKey, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { isValidPhoneNumber, navigatorConfig } from '../utils';
+import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import { Keyboard, Pressable, SafeAreaView, StyleSheet } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { Button, Spinner, Text, useTheme, YStack } from 'tamagui';
+import PhoneInput from '../components/PhoneInput';
 import { useAuth } from '../contexts/AuthContext';
 import useAppTheme from '../hooks/use-app-theme';
-import PhoneInput from '../components/PhoneInput';
-import LinearGradient from 'react-native-linear-gradient';
+import { isValidPhoneNumber, navigatorConfig } from '../utils';
 
 const PhoneLoginScreen = () => {
     const navigation = useNavigation();

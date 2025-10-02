@@ -1,30 +1,30 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
 import { Platform } from 'react-native';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { Image, Spinner, XStack, Text, YStack, useTheme } from 'tamagui';
-import { useFocusEffect } from '@react-navigation/native';
-import { LinearGradient } from 'react-native-linear-gradient';
-import { setI18nConfig } from '../utils/localize';
-import { config, toArray, isArray, later } from '../utils';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useAuth } from '../contexts/AuthContext';
-import useFleetbase from '../hooks/use-fleetbase';
 import BootSplash from 'react-native-bootsplash';
+import { LinearGradient } from 'react-native-linear-gradient';
+import { PERMISSIONS, RESULTS, check } from 'react-native-permissions';
+import { Image, Spinner, XStack, YStack, useTheme } from 'tamagui';
+import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import useFleetbase from '../hooks/use-fleetbase';
+import useStorage from '../hooks/use-storage';
+import { config, isArray, later, toArray } from '../utils';
 import SetupWarningScreen from './SetupWarningScreen';
 
 const APP_NAME = config('APP_NAME');
 const BootScreen = ({ route }) => {
     const params = route.params ?? {};
     const theme = useTheme();
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     const { hasFleetbaseConfig } = useFleetbase();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth() as any;
     const { t } = useLanguage();
     const [error, setError] = useState<Error | null>(null);
     const backgroundColor = toArray(config('BOOTSCREEN_BACKGROUND_COLOR', '$background'));
     const isGradientBackground = isArray(backgroundColor) && backgroundColor.length > 1;
     const locationEnabled = params.locationEnabled;
+    const [orgSelected] = useStorage<boolean>('_org_selected', false as any);
 
     useFocusEffect(
         useCallback(() => {
@@ -46,8 +46,19 @@ const BootScreen = ({ route }) => {
             };
 
             const initializeNavigator = async () => {
+                // If organization/brand not selected yet, force selection first
+                if (!orgSelected) {
+                    setTimeout(() => navigation.navigate('OrganizationSelect' as never), 0);
+                    return;
+                }
+
                 if (!hasFleetbaseConfig()) {
-                    return setError(new Error(t('BootScreen.missingRequiredConfigurationKeys')));
+                    try {
+                        setTimeout(() => navigation.navigate('OrganizationSelect' as never), 0);
+                        return;
+                    } catch (err) {
+                        return setError(new Error('Missing connection configuration.'));
+                    }
                 }
 
                 try {
@@ -71,7 +82,7 @@ const BootScreen = ({ route }) => {
             };
 
             checkLocationPermission();
-        }, [navigation, isAuthenticated])
+        }, [navigation, isAuthenticated, orgSelected])
     );
 
     if (error) {

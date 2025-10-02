@@ -1,13 +1,14 @@
-import React, { createContext, useContext, useReducer, useMemo, useEffect, useCallback, useRef } from 'react';
+// @ts-nocheck
+import { Driver } from '@fleetbase/sdk';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { Platform } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
-import { Driver } from '@fleetbase/sdk';
-import { later, isArray, navigatorConfig } from '../utils';
-import useStorage, { storage } from '../hooks/use-storage';
+import { LoginManager as FacebookLoginManager } from 'react-native-fbsdk-next';
 import useFleetbase from '../hooks/use-fleetbase';
+import useStorage, { storage } from '../hooks/use-storage';
+import { later, navigatorConfig } from '../utils';
 import { useLanguage } from './LanguageContext';
 import { useNotification } from './NotificationContext';
-import { LoginManager as FacebookLoginManager } from 'react-native-fbsdk-next';
 
 const AuthContext = createContext();
 
@@ -253,6 +254,14 @@ export const AuthProvider = ({ children }) => {
         storage.removeItem('_driver_token');
         storage.removeItem('organizations');
         storage.removeItem('driver');
+        // Also clear organization selection so user is prompted again if needed
+        storage.removeItem('_org_selected');
+        storage.removeItem('_org_name');
+        storage.removeItem('INSTANCE_LINK_FLEETBASE_HOST');
+        storage.removeItem('INSTANCE_LINK_FLEETBASE_KEY');
+        storage.removeItem('INSTANCE_LINK_SOCKETCLUSTER_HOST');
+        storage.removeItem('INSTANCE_LINK_SOCKETCLUSTER_PORT');
+        storage.removeItem('INSTANCE_LINK_SOCKETCLUSTER_SECURE');
 
         // If logged in with facebook
         FacebookLoginManager.logOut();
@@ -264,6 +273,49 @@ export const AuthProvider = ({ children }) => {
             dispatch({ type: 'VERIFY', isVerifyingCode: true });
             try {
                 const driver = await fleetbase.drivers.verifyCode(state.phone, code);
+
+                // If a brand/organization was selected beforehand, ensure the driver
+                // belongs to that brand before creating a session.
+                try {
+                    const selectedBrand = storage.getString('_org_name');
+
+                    if (selectedBrand && adapter) {
+                        // Create a temporary Driver instance with adapter to query orgs
+                        const instance = new Driver(driver, adapter);
+                        const orgs = await instance.listOrganizations();
+
+                        // Normalize and check membership by name/slug
+                        const want = String(selectedBrand).toLowerCase();
+                        const belongsToSelected = orgs?.some((o: any) => {
+                            const name = (o?.name ?? o?.getAttribute?.('name'))?.toLowerCase?.();
+                            const slug = (o?.slug ?? o?.getAttribute?.('slug'))?.toLowerCase?.();
+                            if (!name && !slug) return false;
+                            if (want.includes('mazen')) {
+                                return Boolean(name?.includes('mazen') || slug?.includes('mazen'));
+                            }
+                            if (want.includes('mazan')) {
+                                return Boolean(name?.includes('mazan') || slug?.includes('mazan'));
+                            }
+                            // Fallback: loose containment check
+                            return Boolean(name?.includes(want) || slug?.includes(want));
+                        });
+
+                        if (!belongsToSelected) {
+                            // Clear organization selection so user is prompted to select again
+                            storage.removeItem('_org_selected');
+                            storage.removeItem('_org_name');
+                            // Do NOT create a session; inform the caller to show an error
+                            throw new Error(
+                                `Your account is not a member of the selected brand ("${selectedBrand}"). Please choose the correct brand or contact your administrator.`
+                            );
+                        }
+                    }
+                } catch (brandCheckError: any) {
+                    // Re-throw to be handled by the screen (e.g., toast and stay on the same screen)
+                    throw brandCheckError;
+                }
+
+                // Passed brand check (or no brand selected): proceed to create the session
                 createDriverSession(driver);
                 dispatch({ type: 'VERIFY', driver, isVerifyingCode: false });
             } catch (error) {

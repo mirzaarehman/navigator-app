@@ -1,50 +1,44 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { ScrollView, RefreshControl, SafeAreaView, StyleSheet, Alert, Platform } from 'react-native';
-import { Separator, Button, Image, Stack, Text, YStack, XStack, Spinner, useTheme } from 'tamagui';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faPaperPlane, faPenToSquare, faFlagCheckered, faCheck, faBan } from '@fortawesome/free-solid-svg-icons';
-import { BlurView } from '@react-native-community/blur';
-import { PortalHost } from '@gorhom/portal';
-import LaunchNavigator from 'react-native-launch-navigator';
-import FastImage from 'react-native-fast-image';
+// @ts-nocheck
 import { Order, Place } from '@fleetbase/sdk';
-import { format as formatDate, formatDistance, add } from 'date-fns';
+import { faBan, faCheck, faFlagCheckered, faPaperPlane, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { PortalHost } from '@gorhom/portal';
+import { useNavigation } from '@react-navigation/native';
+import { format as formatDate } from 'date-fns';
 import { titleize } from 'inflected';
-import { formatCurrency, formatMeters, formatDuration, smartHumanize } from '../utils/format';
-import { restoreFleetbasePlace, getCoordinates } from '../utils/location';
-import { toast } from '../utils/toast';
-import { config, showActionSheet } from '../utils';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Platform, RefreshControl, ScrollView } from 'react-native';
+import LaunchNavigator from 'react-native-launch-navigator';
+import { Button, Image, Separator, Spinner, Text, useTheme, XStack, YStack } from 'tamagui';
+import Badge from '../components/Badge';
+import { ActionContainer, SectionHeader, SectionInfoLine } from '../components/Content';
+import CurrentDestinationSelect from '../components/CurrentDestinationSelect';
+import DestinationChangedAlert from '../components/DestinationChangedAlert';
+import LiveOrderRoute from '../components/LiveOrderRoute';
+import LoadingOverlay from '../components/LoadingOverlay';
+import OrderActivitySelect from '../components/OrderActivitySelect';
+import OrderCommentThread from '../components/OrderCommentThread';
+import OrderCustomerCard from '../components/OrderCustomerCard';
+import OrderDocumentFiles from '../components/OrderDocumentFiles';
+import OrderPayloadEntities from '../components/OrderPayloadEntities';
+import OrderProgressBar from '../components/OrderProgressBar';
+import OrderProofOfDelivery from '../components/OrderProofOfDelivery';
+import OrderWaypointList from '../components/OrderWaypointList';
+import Spacer from '../components/Spacer';
 import { useAuth } from '../contexts/AuthContext';
-import { useLocation } from '../contexts/LocationContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useLocation } from '../contexts/LocationContext';
 import { useOrderManager } from '../contexts/OrderManagerContext';
 import { useTempStore } from '../contexts/TempStoreContext';
-import useSocketClusterClient from '../hooks/use-socket-cluster-client';
-import useStorage from '../hooks/use-storage';
 import useAppTheme from '../hooks/use-app-theme';
+import useFleetbase from '../hooks/use-fleetbase';
 import useOrderResource from '../hooks/use-order-resource';
 import usePromiseWithLoading from '../hooks/use-promise-with-loading';
-import useFleetbase from '../hooks/use-fleetbase';
-import LiveOrderRoute from '../components/LiveOrderRoute';
-import PlaceCard from '../components/PlaceCard';
-import OrderItems from '../components/OrderItems';
-import OrderTotal from '../components/OrderTotal';
-import OrderWaypointList from '../components/OrderWaypointList';
-import OrderPayloadEntities from '../components/OrderPayloadEntities';
-import OrderDocumentFiles from '../components/OrderDocumentFiles';
-import OrderCustomerCard from '../components/OrderCustomerCard';
-import OrderProgressBar from '../components/OrderProgressBar';
-import OrderCommentThread from '../components/OrderCommentThread';
-import OrderProofOfDelivery from '../components/OrderProofOfDelivery';
-import CurrentDestinationSelect from '../components/CurrentDestinationSelect';
-import OrderActivitySelect from '../components/OrderActivitySelect';
-import LoadingOverlay from '../components/LoadingOverlay';
-import DestinationChangedAlert from '../components/DestinationChangedAlert';
-import Badge from '../components/Badge';
-import Spacer from '../components/Spacer';
-import BackButton from '../components/BackButton';
-import { SectionHeader, SectionInfoLine, ActionContainer } from '../components/Content';
+import useSocketClusterClient from '../hooks/use-socket-cluster-client';
+import { config, showActionSheet } from '../utils';
+import { formatDuration, formatMeters, smartHumanize } from '../utils/format';
+import { getCoordinates, restoreFleetbasePlace } from '../utils/location';
+import { toast } from '../utils/toast';
 
 const getOrderDestination = (order, adapter) => {
     const pickup = order.getAttribute('payload.pickup');
@@ -489,45 +483,6 @@ const OrderScreen = ({ route }) => {
                 showsHorizontalScrollIndicator={false}
                 refreshControl={<RefreshControl refreshing={isLoading('isReloading')} onRefresh={reloadOrder} tintColor={theme['$blue-500'].val} />}
             >
-                <YStack position='relative' width='100%' height={350} borderBottomWidth={0} borderColor='$borderColorWithShadow'>
-                    <YStack position='absolute' top={0} left={0} right={0} zIndex={1}>
-                        <XStack bg='$info' borderBottomWidth={1} borderColor='$infoBorder' padding='$3' space='$2'>
-                            <YStack>
-                                <Image
-                                    width={60}
-                                    height={60}
-                                    bg='white'
-                                    padding='$1'
-                                    borderRadius='$1'
-                                    source={{ uri: `data:image/png;base64,${order.getAttribute('tracking_number.qr_code')}` }}
-                                />
-                            </YStack>
-                            <XStack flex={1} justifyContent='space-between'>
-                                <YStack flex={1}>
-                                    <Text color={isDarkMode ? '$textPrimary' : '$gray-100'} fontSize={19} fontWeight='bold'>
-                                        {order.getAttribute('tracking_number.tracking_number')}
-                                    </Text>
-                                    <Text color={isDarkMode ? '$textPrimary' : '$gray-200'} fontSize={15}>
-                                        {formatDate(new Date(order.getAttribute('created_at')), 'PP HH:mm')}
-                                    </Text>
-                                </YStack>
-                                <YStack>
-                                    <Badge status={order.getAttribute('status')} />
-                                </YStack>
-                            </XStack>
-                        </XStack>
-                    </YStack>
-                    <LiveOrderRoute
-                        order={order}
-                        zoom={4}
-                        edgePaddingTop={80}
-                        edgePaddingBottom={30}
-                        edgePaddingLeft={30}
-                        edgePaddingRight={30}
-                        focusCurrentDestination={isMultipleWaypointOrder}
-                        currentDestination={destination}
-                    />
-                </YStack>
                 <ActionContainer space='$3'>
                     {isOldAndroid && showLoadingOverlay && (
                         <YStack>
@@ -613,6 +568,60 @@ const OrderScreen = ({ route }) => {
                         </YStack>
                     ))}
                 </YStack>
+                {/* Move route map to center after order info */}
+                <YStack position='relative' width='100%' height={350} borderBottomWidth={0} borderColor='$borderColorWithShadow'>
+                    <YStack position='absolute' top={0} left={0} right={0} zIndex={1}>
+                        <XStack bg='$info' borderBottomWidth={1} borderColor='$infoBorder' padding='$3' space='$2'>
+                            <YStack>
+                                <Image
+                                    width={60}
+                                    height={60}
+                                    bg='white'
+                                    padding='$1'
+                                    borderRadius='$1'
+                                    source={{ uri: `data:image/png;base64,${order.getAttribute('tracking_number.qr_code')}` }}
+                                />
+                            </YStack>
+                            <XStack flex={1} justifyContent='space-between'>
+                                <YStack flex={1}>
+                                    <Text color={isDarkMode ? '$textPrimary' : '$gray-100'} fontSize={19} fontWeight='bold'>
+                                        {order.getAttribute('tracking_number.tracking_number')}
+                                    </Text>
+                                    <Text color={isDarkMode ? '$textPrimary' : '$gray-200'} fontSize={15}>
+                                        {formatDate(new Date(order.getAttribute('created_at')), 'PP HH:mm')}
+                                    </Text>
+                                </YStack>
+                                <YStack>
+                                    <Badge status={order.getAttribute('status')} />
+                                </YStack>
+                            </XStack>
+                        </XStack>
+                    </YStack>
+                    <LiveOrderRoute
+                        order={order}
+                        zoom={4}
+                        edgePaddingTop={80}
+                        edgePaddingBottom={30}
+                        edgePaddingLeft={30}
+                        edgePaddingRight={30}
+                        focusCurrentDestination={isMultipleWaypointOrder}
+                        currentDestination={destination}
+                    />
+                </YStack>
+                {order.isAttributeFilled('customer') && (
+                    <>
+                        <SectionHeader title='Customer' />
+                        <YStack px='$3' py='$4'>
+                            <OrderCustomerCard customer={order.getAttribute('customer')}  driverName={order.attributes.driver_assigned?.name}
+                                                                                                    orgName={order.attributes.driver_assigned?.company_name}
+                                                                                                   entities={order.attributes.payload.entities}
+                                                                                                    order={{
+                                                                                                      number: order.attributes?.id,
+                                                                                                      total: 0,
+                                                                                                    }} />
+                        </YStack>
+                    </>
+                )}
                 <SectionHeader title='Order Route' />
                 <YStack px='$3' py='$4'>
                     <OrderWaypointList order={order} />
@@ -653,14 +662,7 @@ const OrderScreen = ({ route }) => {
                 <YStack>
                     <OrderPayloadEntities order={order} onPress={({ entity, waypoint }) => navigation.navigate('Entity', { entity, waypoint })} />
                 </YStack>
-                {order.isAttributeFilled('customer') && (
-                    <>
-                        <SectionHeader title='Customer' />
-                        <YStack px='$3' py='$4'>
-                            <OrderCustomerCard customer={order.getAttribute('customer')} />
-                        </YStack>
-                    </>
-                )}
+                
                 <SectionHeader title='Order Documents & Files' />
                 <YStack>
                     <OrderDocumentFiles order={order} />

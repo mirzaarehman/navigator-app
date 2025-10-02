@@ -63,6 +63,7 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
         (key, defaultValue = null) => {
             const fullConfig = {
                 FLEETBASE_HOST: instanceLinkedFleetbaseHost ?? config('FLEETBASE_HOST'),
+                // Allow default fallback to env/config FLEETBASE_KEY when instance-linked key is not set
                 FLEETBASE_KEY: instanceLinkedFleetbaseKey ?? config('FLEETBASE_KEY'),
                 SOCKETCLUSTER_HOST: instanceLinkedSocketclusterHost ?? config('SOCKETCLUSTER_HOST', 'socket.fleetbase.io'),
                 SOCKETCLUSTER_PORT: parseInt(instanceLinkedSocketclusterPort ?? config('SOCKETCLUSTER_PORT', '8000')),
